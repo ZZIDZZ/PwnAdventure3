@@ -2,6 +2,7 @@ import socket
 import os
 from threading import Thread
 import parser_part9 as parser
+from importlib import reload
 
 # Part 9
 # Developing a TCP Network Proxy - Pwn Adventure 3
@@ -27,7 +28,7 @@ class Proxy2Server(Thread):
                     reload(parser)                        
                     parser.parse(data, self.port, 'server')
                 except Exception as e:
-                    print 'server[{}]'.format(self.port), e
+                    print ('server[{}]'.format(self.port), e)
                 # forward to client
                 self.game.sendall(data)
 
@@ -54,7 +55,7 @@ class Game2Proxy(Thread):
                     reload(parser)        
                     parser.parse(data, self.port, 'client')
                 except Exception as e:
-                    print 'client[{}]'.format(self.port), e
+                    print ('client[{}]'.format(self.port), e)
                 # forward to server
                 self.server.sendall(data)
 
@@ -68,10 +69,10 @@ class Proxy(Thread):
 
     def run(self):
         while True:
-            print "[proxy({})] setting up".format(self.port)
+            print ("[proxy({})] setting up".format(self.port))
             self.g2p = Game2Proxy(self.from_host, self.port) # waiting for a client
             self.p2s = Proxy2Server(self.to_host, self.port)
-            print "[proxy({})] connection established".format(self.port)
+            print ("[proxy({})] connection established".format(self.port))
             self.g2p.server = self.p2s.server
             self.p2s.game = self.g2p.game
 
@@ -79,22 +80,22 @@ class Proxy(Thread):
             self.p2s.start()
 
 
-master_server = Proxy('0.0.0.0', '192.168.178.54', 3333)
+master_server = Proxy('0.0.0.0', '...', 3333)
 master_server.start()
 
 game_servers = []
 for port in range(3000, 3006):
-    _game_server = Proxy('0.0.0.0', '192.168.178.54', port)
+    _game_server = Proxy('0.0.0.0', '...', port)
     _game_server.start()
     game_servers.append(_game_server)
 
 
 while True:
     try:
-        cmd = raw_input('$ ')
+        cmd = input('$ ')
         if cmd[:4] == 'quit':
             os._exit(0)
     except Exception as e:
-        print e
+        print (e)
 
 
